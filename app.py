@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import scipy.stats as stats
 
 st.set_page_config(
     page_title="Analisis Estadistico",
@@ -117,3 +118,76 @@ if datos is not None:
         key="pregunta_outliers",
         height=100,
     )
+
+    st.divider()
+    st.subheader("Prueba de Hipotesis (Prueba Z)")
+
+    col_h0, col_test, col_alpha = st.columns(3)
+
+    with col_h0:
+        valor_h0 = st.number_input("Valor de la Hipotesis Nula (H0)", value=50.0, step=1.0)
+    with col_test:
+        tipo_prueba = st.selectbox("Tipo de prueba", ["Bilateral", "Cola izquierda", "Cola derecha"])
+    with col_alpha:
+        alpha = st.selectbox("Nivel de significancia (alpha)", [0.01, 0.05, 0.10], index=1)
+
+    n_obs = len(datos)
+    media_muestral = datos.mean()
+    desviacion_muestral = datos.std(ddof=1)
+    
+    error_estandar = desviacion_muestral / np.sqrt(n_obs)
+    if error_estandar == 0:
+        st.error("Error estandar es 0, no se puede calcular Z.")
+    else:
+        z_calc = (media_muestral - valor_h0) / error_estandar
+
+        if tipo_prueba == "Bilateral":
+            p_value = 2 * (1 - stats.norm.cdf(abs(z_calc)))
+            z_crit_izq = stats.norm.ppf(alpha / 2)
+            z_crit_der = stats.norm.ppf(1 - alpha / 2)
+        elif tipo_prueba == "Cola izquierda":
+            p_value = stats.norm.cdf(z_calc)
+            z_crit_izq = stats.norm.ppf(alpha)
+            z_crit_der = None
+        else:
+            p_value = 1 - stats.norm.cdf(z_calc)
+            z_crit_izq = None
+            z_crit_der = stats.norm.ppf(1 - alpha)
+
+        if p_value < alpha:
+            decision = "Rechazar H0"
+        else:
+            decision = "No rechazar H0"
+
+        col_res1, col_res2, col_res3, col_res4 = st.columns(4)
+        col_res1.metric("Media Muestral", f"{media_muestral:.4f}")
+        col_res2.metric("Estadistico Z", f"{z_calc:.4f}")
+        col_res3.metric("Valor p", f"{p_value:.4f}")
+        col_res4.metric("Decision", decision)
+
+        fig_z, ax_z = plt.subplots(figsize=(10, 5))
+        x = np.linspace(-4, 4, 1000)
+        y = stats.norm.pdf(x, 0, 1)
+        ax_z.plot(x, y, color="black", linewidth=2)
+
+        if tipo_prueba == "Bilateral":
+            x_shade_left = x[x <= z_crit_izq]
+            ax_z.fill_between(x_shade_left, stats.norm.pdf(x_shade_left, 0, 1), color="#D62728", alpha=0.5, label="Region de Rechazo")
+            x_shade_right = x[x >= z_crit_der]
+            ax_z.fill_between(x_shade_right, stats.norm.pdf(x_shade_right, 0, 1), color="#D62728", alpha=0.5)
+        elif tipo_prueba == "Cola izquierda":
+            x_shade_left = x[x <= z_crit_izq]
+            ax_z.fill_between(x_shade_left, stats.norm.pdf(x_shade_left, 0, 1), color="#D62728", alpha=0.5, label="Region de Rechazo")
+        else:
+            x_shade_right = x[x >= z_crit_der]
+            ax_z.fill_between(x_shade_right, stats.norm.pdf(x_shade_right, 0, 1), color="#D62728", alpha=0.5, label="Region de Rechazo")
+
+        ax_z.axvline(x=z_calc, color="#1F77B4", linestyle="--", linewidth=2, label=f"Z Calculado = {z_calc:.2f}")
+
+        ax_z.set_title("Distribucion Normal Estandar (Prueba Z)")
+        ax_z.set_xlabel("Puntuacion Z")
+        ax_z.set_ylabel("Densidad de Probabilidad")
+        ax_z.legend(loc="upper right")
+        ax_z.grid(True, alpha=0.3)
+
+        st.pyplot(fig_z)
