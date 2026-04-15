@@ -1,6 +1,8 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 st.set_page_config(
     page_title="Analisis Estadistico",
@@ -66,3 +68,52 @@ if datos is not None:
     st.subheader(f"Variable seleccionada: {variable_seleccionada}")
     df_vista = pd.DataFrame(datos).head(5)
     st.dataframe(df_vista, use_container_width=True)
+
+    st.divider()
+    st.subheader("Visualizacion de la Distribucion")
+
+    col1, col2, col3 = st.columns(3)
+
+    with col1:
+        fig1, ax1 = plt.subplots()
+        ax1.hist(datos, bins=20, color="#4C72B0", edgecolor="black")
+        ax1.set_title("Histograma")
+        ax1.set_xlabel(variable_seleccionada)
+        ax1.set_ylabel("Frecuencia")
+        st.pyplot(fig1)
+
+    with col2:
+        fig2, ax2 = plt.subplots()
+        sns.kdeplot(datos, ax=ax2, fill=True, color="#55A868")
+        ax2.set_title("KDE (Kernel Density Estimation)")
+        ax2.set_xlabel(variable_seleccionada)
+        ax2.set_ylabel("Densidad")
+        st.pyplot(fig2)
+
+    with col3:
+        fig3, ax3 = plt.subplots()
+        sns.boxplot(x=datos, ax=ax3, color="#C44E52")
+        ax3.set_title("Boxplot")
+        ax3.set_xlabel(variable_seleccionada)
+        st.pyplot(fig3)
+
+    st.divider()
+    st.subheader("Analisis Exploratorio - Cuestionario")
+
+    st.text_area(
+        "1. Basandose en los graficos, la distribucion parece normal? Justifique.",
+        key="pregunta_normalidad",
+        height=100,
+    )
+
+    st.text_area(
+        "2. Hay presencia de sesgo (asimetria) en la distribucion? Explique.",
+        key="pregunta_sesgo",
+        height=100,
+    )
+
+    st.text_area(
+        "3. Se observan valores atipicos (outliers) en el boxplot? Describa.",
+        key="pregunta_outliers",
+        height=100,
+    )
