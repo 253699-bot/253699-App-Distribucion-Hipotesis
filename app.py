@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
+import google.generativeai as genai
 
 st.set_page_config(
     page_title="Analisis Estadistico",
@@ -191,3 +192,29 @@ if datos is not None:
         ax_z.grid(True, alpha=0.3)
 
         st.pyplot(fig_z)
+
+        st.divider()
+        st.subheader("Asistente Estadistico con IA")
+
+        api_key = st.text_input("Ingrese su API Key de Google Gemini", type="password")
+
+        if st.button("Consultar a la IA"):
+            if not api_key:
+                st.error("Por favor, ingrese una API Key valida.")
+            else:
+                try:
+                    genai.configure(api_key=api_key)
+                    model = genai.GenerativeModel("gemini-1.5-flash")
+                    prompt = f"Se realizo una prueba Z con los siguientes parametros: media muestral = {media_muestral:.4f}, n = {n_obs}, desviacion estandar = {desviacion_muestral:.4f}, alpha = {alpha}, tipo de prueba = {tipo_prueba}. El estadistico Z fue = {z_calc:.4f} y el p-value = {p_value:.4f}. Se rechaza H0? Explica la decision y si los supuestos de la prueba son razonables."
+                    
+                    with st.spinner("Consultando a Gemini..."):
+                        response = model.generate_content(prompt)
+                        st.info(response.text)
+                except Exception as e:
+                    st.error(f"Error al conectar con la API de Gemini: {str(e)}")
+
+        st.text_area(
+            "Compare su conclusion con la de la IA. Escriba sus observaciones:",
+            key="comparacion_ia",
+            height=100,
+        )
