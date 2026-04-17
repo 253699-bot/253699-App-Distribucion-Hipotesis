@@ -5,6 +5,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
 import google.generativeai as genai
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def configurar_pagina():
     st.set_page_config(page_title="Analisis Estadistico", layout="wide")
@@ -119,11 +123,11 @@ def graficar_prueba_z(z_calc, z_crit_izq, z_crit_der, tipo_prueba):
 def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba, z_calc, p_value):
     st.divider()
     st.subheader("Asistente Estadistico con IA")
-    api_key = st.text_input("Ingrese su API Key de Google Gemini", type="password")
+    api_key = os.environ.get("GEMINI_API_KEY")
 
     if st.button("Consultar a la IA"):
         if not api_key:
-            st.error("Por favor, ingrese una API Key valida.")
+            st.error("Por favor, configure la GEMINI_API_KEY en el archivo .env.")
         else:
             try:
                 genai.configure(api_key=api_key)
