@@ -6,3 +6,4 @@ seaborn
 scipy
 google-genai
 python-dotenv
+fpdf2

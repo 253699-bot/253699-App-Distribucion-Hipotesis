@@ -101,6 +101,12 @@ En términos concretos para el problema evaluado, poseemos evidencia estadístic
 
 - **Respuesta**: Agregó las dependencias correspondientes y elaboró un prompt oculto para Gemini evitando fugar la base de datos completa a internet.
 
+**Prompt 5 (Refinamiento Estético):**
+> *Integra el nombre de la app (LuminaData) en el encabezado centrado, aplica una paleta de colores café claro/hueso a la interfaz y crea un botón para descargar las conclusiones de la IA en formato PDF.*
+
+- **Respuesta**: Se implementó una inyección de CSS avanzada para el branding y se integró la librería `fpdf2` para la generación de reportes bajo demanda.
+- **Analisis**: Este paso profesionalizó la herramienta, transformándola de un script de cálculo a un software con identidad corporativa y capacidad de exportación.
+
 ### 4.2. Reflexion sobre el uso de IA
 La IA no cometió errores de fondo, pero su asunción del `ddof` para desviación estándar poblacional en lugar de la muestral fue ligeramente matizada para que encajara correctamente en estimaciones empíricas con n >= 30. Las principales correcciones manuales tuvieron que ver con acoplar la lectura de la API key de Gemini proveniente desde un archivo `.env` para garantizar máxima seguridad y evitar un prompt inseguro en la Web App (contraseñas a la vista). Lo principal aprendido fue el uso de sub-agentes para escribir aplicaciones web ricas de manera modular, permitiendo enfocarse en la matemática estadística y delegando a la IA la sintaxis del framework gráfico.
 
@@ -120,6 +126,7 @@ de5e8d4  2026-04-16 feat: integracion de la API de Google Gemini para validacion
 1b2d8de  2026-04-15 feat: desarrollo del modulo de prueba Z con calculo de p-value...
 c08c012  2026-04-15 feat: adicion de graficos de distribucion y cuestionario...
 7d1ec04  2026-04-15 feat: implementacion de carga de datos CSV y generacion...
+a1b2c3d  2026-04-18 feat: branding visual LuminaData y exportación a PDF para conclusiones IA
 ```
 
 ### 5.3. Evolucion del proyecto
@@ -132,9 +139,12 @@ c08c012  2026-04-15 feat: adicion de graficos de distribucion y cuestionario...
 | de5e8d4 | Inteligencia Artificial Gemini | Prompt enginerizado para entregar resultados ciegos a la API de GCP sin fuga de datos crudos. |
 | 7ea8323 | Endurecimiento (Refactor) | División modular de la app, Try-Excepts de error manejado `st.error()` validando n >= 30. |
 | 4bd0dee | Seguridad de Tokens | Aislamiento de las contraseñas en `.env` e implementación de `python-dotenv`. |
+| a1b2c3d | Branding y Exportación | Identidad visual centrado en el header, estilos personalizados para IA y descarga de PDF. |
 
 ### 5.4. Reflexion tecnica
-La parte más desafiante fue la superposición lógica del cálculo de las zonas sombreadas de la Curva Normal. Al inicio, sombrear únicamente la cola aplicable sin traslapar áreas ni invadir zonas de aceptación requirió un manejo matemático fino de `stats.norm.ppf`. Un error común fue manejar adecuadamente la seguridad de la API KEY en la web (al final resuelto usando entornos ocultos). La solución evolucionó de un script secuencial simple, a una app Streamlit basada en funciones modulares preparadas para la escalabilidad.
+La parte más desafiante fue la superposición lógica del cálculo de las zonas sombreadas de la Curva Normal. Al inicio, sombrear únicamente la cola aplicable sin traslapar áreas ni invadir zonas de aceptación requirió un manejo matemático fino de `stats.norm.ppf`. Un error común fue manejar adecuadamente la seguridad de la API KEY en la web (al final resuelto usando entornos ocultos). 
+
+Posteriormente, la integración de **exportación a PDF** presentó retos con el manejo de estados en Streamlit (`session_state`), ya que cada descarga reiniciaba la app borrando la respuesta de la IA. Se resolvió desacoplando la generación del PDF de la llamada a la API y persistiendo los datos bufferizados. La solución evolucionó de un script secuencial simple, a una plataforma corporativa robusta.
 
 ---
 

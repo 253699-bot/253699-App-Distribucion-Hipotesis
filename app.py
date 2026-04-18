@@ -7,6 +7,8 @@ import scipy.stats as stats
 from google import genai
 import os
 from dotenv import load_dotenv
+from fpdf import FPDF
+import io
 
 load_dotenv()
 
@@ -44,6 +46,32 @@ def configurar_pagina():
             background-color: #F5F0E6;
         }
 
+        /* Styling the top header bar */
+        [data-testid="stHeader"] {
+            background-color: #E6D5B8 !important;
+            border-bottom: 1px solid #D7C4A5;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: 3.5rem;
+        }
+
+        /* Adding the app name to the header */
+        [data-testid="stHeader"]::before {
+            content: "LuminaData";
+            position: absolute;
+            width: 100%;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            text-align: center;
+            font-weight: 700;
+            font-size: 1.6rem;
+            color: #3E2A20;
+            letter-spacing: -0.5px;
+            font-family: 'Montserrat', sans-serif;
+            text-shadow: 1px 1px 0px rgba(255,255,255,0.3);
+            pointer-events: none;
+        }
+
         [data-testid="stSidebar"] {
             background: linear-gradient(180deg, #3e2a20 0%, #111111 100%);
         }
@@ -76,6 +104,28 @@ def configurar_pagina():
         
         [data-testid="metric-container"] label, [data-testid="metric-container"] div {
             color: #1A1A1A !important;
+        }
+
+        /* Estilo para las conclusiones de la IA */
+        .ia-response {
+            background-color: #E6D5B8;
+            color: #3E2A20;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 5px solid #A2FDD5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin: 15px 0;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        
+        /* Divisor parcial para el sidebar */
+        .sidebar-divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #A2FDD5, transparent);
+            width: 70%;
+            margin: 10px auto 25px auto;
+            border-radius: 2px;
         }
         
         /* Modificar el titulo del sidebar manual via clase CSS ya que esta embebido en st.sidebar.markdown */
@@ -121,7 +171,7 @@ def generar_sinteticos():
 
 def obtener_datos():
     st.sidebar.markdown('<p class="jade-cobra-title">LuminaData</p>', unsafe_allow_html=True)
-    st.sidebar.markdown("---")
+    st.sidebar.markdown('<div class="sidebar-divider"></div>', unsafe_allow_html=True)
     st.sidebar.header("Entrada de Datos")
     fuente_datos = st.sidebar.radio(
         "Seleccione la fuente:",
@@ -228,10 +278,62 @@ def graficar_prueba_z(z_calc, z_crit_izq, z_crit_der, tipo_prueba):
     
     st.pyplot(fig_z, transparent=True)
 
+def generar_pdf_conclusiones(texto):
+    pdf = FPDF()
+    pdf.add_page()
+    
+    # Configurar colores (Paleta LuminaData)
+    # Fondo ligero: #F5F0E6 (245, 240, 230)
+    pdf.set_fill_color(245, 240, 230)
+    pdf.rect(0, 0, 210, 297, "F")
+    
+    # Título Principal
+    pdf.set_font("Helvetica", "B", 24)
+    pdf.set_text_color(62, 42, 32) # #3E2A20
+    pdf.cell(0, 20, "LuminaData - Reporte IA", ln=True, align="C")
+    
+    # Línea decorativa
+    pdf.set_draw_color(162, 253, 213) # #A2FDD5
+    pdf.set_line_width(1)
+    pdf.line(50, 30, 160, 30)
+    
+    pdf.ln(15)
+    
+    # Título de Sección
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.set_text_color(62, 42, 32)
+    pdf.cell(0, 10, "Conclusiones del Analisis Estadistico", ln=True)
+    
+    pdf.ln(5)
+    
+    # Contenido de la conclusión
+    pdf.set_font("Helvetica", "", 12)
+    pdf.set_text_color(26, 26, 26) # #1A1A1A
+    
+    # Reemplazar caracteres no compatibles con latin-1 si es necesario
+    try:
+        safe_text = texto.encode('latin-1', 'replace').decode('latin-1')
+    except:
+        safe_text = texto
+        
+    pdf.multi_cell(0, 10, safe_text)
+    
+    pdf.ln(20)
+    pdf.set_font("Helvetica", "I", 10)
+    pdf.set_text_color(126, 99, 78)
+    pdf.cell(0, 10, "Generado automaticamente por LuminaData Assistant", ln=True, align="R")
+    
+    # Retornar como Bytes
+    return pdf.output()
+
 def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba, z_calc, p_value, decision):
     st.divider()
     st.header("5. Asistente Estadístico con IA")
     api_key = os.environ.get("GEMINI_API_KEY")
+
+    # Inicializar estado si no existe
+    if 'ia_conclusion' not in st.session_state:
+        st.session_state.ia_conclusion = None
 
     if st.button("Consultar Conclusión con la IA"):
         if not api_key:
@@ -247,12 +349,29 @@ def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba,
                 
                 with st.spinner("Conectando con Google Gemini..."):
                     response = client.models.generate_content(
-                        model='gemini-2.5-flash',
+                        model='gemini-2.0-flash',
                         contents=prompt
                     )
-                    st.info(response.text)
+                    st.session_state.ia_conclusion = response.text
             except Exception as e:
                 st.error(f"Error de API: {str(e)}")
+
+    # Mostrar conclusión si existe
+    if st.session_state.ia_conclusion:
+        st.markdown(f'<div class="ia-response">{st.session_state.ia_conclusion}</div>', unsafe_allow_html=True)
+        
+        # Generar enlace de descarga
+        try:
+            pdf_bytes = generar_pdf_conclusiones(st.session_state.ia_conclusion)
+            st.download_button(
+                label="📄 Descargar Conclusión (PDF)",
+                data=pdf_bytes,
+                file_name="conclusion_luminadata.pdf",
+                mime="application/pdf",
+                key="download_pdf_btn"
+            )
+        except Exception as e:
+            st.error(f"No se pudo generar el PDF: {str(e)}")
 
     st.text_area("Observaciones Finales Manuales:", key="comparacion_ia", height=100)
 
