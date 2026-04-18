@@ -222,7 +222,7 @@ def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba,
                 
                 with st.spinner("Conectando con Google Gemini..."):
                     response = client.models.generate_content(
-                        model='gemini-1.5-flash',
+                        model='gemini-2.5-flash',
                         contents=prompt
                     )
                     st.info(response.text)
