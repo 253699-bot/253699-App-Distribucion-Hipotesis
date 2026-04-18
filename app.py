@@ -126,13 +126,13 @@ def cuestionario_exploratorio():
     st.header("3. Analisis Exploratorio - Cuestionario")
     
     st.markdown("**A. Basandose en los graficos, la distribucion parece normal?**")
-    st.radio("Seleccione una opcion para la distribucion:", ["Si, se aproxima a una campana de Gauss", "No, difiere significativamente", "No estoy seguro visualmente"], key="pregunta_normalidad", horizontal=True, label_visibility="collapsed")
+    st.selectbox("Seleccione una opcion para la distribucion:", ["(Seleccionar opción)", "Si, se aproxima a una campana de Gauss", "No, difiere significativamente", "No estoy seguro visualmente"], key="pregunta_normalidad", label_visibility="collapsed")
     
     st.markdown("**B. Hay presencia de sesgo (asimetria) en la distribucion?**")
-    st.radio("Seleccione el tipo de sesgo:", ["Si, sesgo a la izquierda (cola izquierda)", "Si, sesgo a la derecha (cola derecha)", "No, parece simetrica"], key="pregunta_sesgo", horizontal=True, label_visibility="collapsed")
+    st.selectbox("Seleccione el tipo de sesgo:", ["(Seleccionar opción)", "Si, sesgo a la izquierda (cola izquierda)", "Si, sesgo a la derecha (cola derecha)", "No, parece simetrica"], key="pregunta_sesgo", label_visibility="collapsed")
     
     st.markdown("**C. Se observan valores atipicos (outliers) en el boxplot?**")
-    st.radio("Seleccione una observacion sobre los outliers:", ["Si, multiples valores atipicos", "Si, solo uno o dos aislados", "No se observan valores atipicos"], key="pregunta_outliers", horizontal=True, label_visibility="collapsed")
+    st.selectbox("Seleccione una observacion sobre los outliers:", ["(Seleccionar opción)", "Si, multiples valores atipicos", "Si, solo uno o dos aislados", "No se observan valores atipicos"], key="pregunta_outliers", label_visibility="collapsed")
 
 def graficar_prueba_z(z_calc, z_crit_izq, z_crit_der, tipo_prueba):
     fig_z, ax_z = plt.subplots(figsize=(10, 4))
