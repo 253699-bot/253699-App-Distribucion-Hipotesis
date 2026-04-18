@@ -11,7 +11,22 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def configurar_pagina():
-    st.set_page_config(page_title="Analisis Estadistico", layout="wide")
+    st.set_page_config(page_title="LuminaData", layout="wide")
+    
+    # Configuración global de Matplotlib para estilo minimalista orgánico
+    plt.rcParams.update({
+        'figure.facecolor': '#FFF9E1',
+        'axes.facecolor': '#FFF9E1',
+        'font.family': 'sans-serif',
+        'font.sans-serif': ['Montserrat', 'Inter', 'DejaVu Sans', 'Arial'],
+        'text.color': '#553D2A',
+        'axes.labelcolor': '#553D2A',
+        'xtick.color': '#553D2A',
+        'ytick.color': '#553D2A',
+        'axes.edgecolor': '#553D2A',
+        'grid.color': '#C7B69F',
+        'grid.linestyle': ':'
+    })
     
     st.markdown("""
         <style>
@@ -105,12 +120,12 @@ def generar_sinteticos():
     return datos, "valor_sintetico"
 
 def obtener_datos():
-    st.sidebar.markdown('<p class="jade-cobra-title">JADE COBRA</p>', unsafe_allow_html=True)
+    st.sidebar.markdown('<p class="jade-cobra-title">LuminaData</p>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
     st.sidebar.header("Entrada de Datos")
     fuente_datos = st.sidebar.radio(
         "Seleccione la fuente:",
-        ("Subir archivo CSV", "Generar datos sinteticos"),
+        ("Subir archivo CSV", "Generar datos sintéticos"),
     )
     if fuente_datos == "Subir archivo CSV":
         return cargar_csv()
@@ -125,100 +140,110 @@ def mostrar_vista_previa(datos, variable_seleccionada):
 
 def mostrar_visualizaciones(datos, variable_seleccionada):
     st.divider()
-    st.header("2. Visualizacion de la Distribucion")
+    st.header("2. Visualización de la Distribución")
     col1, col2, col3 = st.columns(3)
     
-    color_graficos = "#607D8B"
+    color_graficos = "#553D2A"
 
     with col1:
         fig1, ax1 = plt.subplots(figsize=(6, 4))
-        ax1.hist(datos, bins=20, color=color_graficos, edgecolor="white")
-        ax1.set_title("Histograma", fontsize=10)
+        ax1.hist(datos, bins=20, color=color_graficos, edgecolor="#FFF9E1")
+        ax1.set_title("Histograma", fontsize=10, fontweight='bold')
         ax1.set_xlabel(variable_seleccionada)
         ax1.set_ylabel("Frecuencia")
-        st.pyplot(fig1)
+        ax1.spines['top'].set_visible(False)
+        ax1.spines['right'].set_visible(False)
+        ax1.grid(True, axis='y', alpha=0.3)
+        st.pyplot(fig1, transparent=True)
 
     with col2:
         fig2, ax2 = plt.subplots(figsize=(6, 4))
-        sns.kdeplot(datos, ax=ax2, fill=True, color=color_graficos)
-        ax2.set_title("KDE (Kernel Density Estimation)", fontsize=10)
+        sns.kdeplot(datos, ax=ax2, fill=True, color=color_graficos, alpha=0.7)
+        ax2.set_title("KDE (Estimación de Densidad)", fontsize=10, fontweight='bold')
         ax2.set_xlabel(variable_seleccionada)
         ax2.set_ylabel("Densidad")
-        st.pyplot(fig2)
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['right'].set_visible(False)
+        ax2.grid(True, alpha=0.3)
+        st.pyplot(fig2, transparent=True)
 
     with col3:
         fig3, ax3 = plt.subplots(figsize=(6, 4))
         sns.boxplot(x=datos, ax=ax3, color=color_graficos)
-        ax3.set_title("Boxplot", fontsize=10)
+        # Ajustar colores del boxplot para contraste
+        plt.setp(ax3.artists, edgecolor='#553D2A', facecolor='#7E634E')
+        ax3.set_title("Boxplot (Diagrama de Caja)", fontsize=10, fontweight='bold')
         ax3.set_xlabel(variable_seleccionada)
-        st.pyplot(fig3)
+        ax3.spines['top'].set_visible(False)
+        ax3.spines['right'].set_visible(False)
+        ax3.grid(True, axis='x', alpha=0.3)
+        st.pyplot(fig3, transparent=True)
 
 def cuestionario_exploratorio():
     st.divider()
-    st.header("3. Analisis Exploratorio - Cuestionario")
+    st.header("3. Análisis Exploratorio - Cuestionario")
     
-    st.markdown("**A. Basandose en los graficos, la distribucion parece normal?**")
-    st.selectbox("Seleccione una opcion para la distribucion:", ["(Seleccionar opción)", "Si, se aproxima a una campana de Gauss", "No, difiere significativamente", "No estoy seguro visualmente"], key="pregunta_normalidad", label_visibility="collapsed")
+    st.markdown("**A. Basándose en los gráficos, ¿la distribución parece normal?**")
+    st.selectbox("Seleccione una opción para la distribución:", ["(Seleccionar opción)", "Sí, se aproxima a una campana de Gauss", "No, difiere significativamente", "No estoy seguro visualmente"], key="pregunta_normalidad", label_visibility="collapsed")
     
-    st.markdown("**B. Hay presencia de sesgo (asimetria) en la distribucion?**")
-    st.selectbox("Seleccione el tipo de sesgo:", ["(Seleccionar opción)", "Si, sesgo a la izquierda (cola izquierda)", "Si, sesgo a la derecha (cola derecha)", "No, parece simetrica"], key="pregunta_sesgo", label_visibility="collapsed")
+    st.markdown("**B. ¿Hay presencia de sesgo (asimetría) en la distribución?**")
+    st.selectbox("Seleccione el tipo de sesgo:", ["(Seleccionar opción)", "Sí, sesgo a la izquierda (cola izquierda)", "Sí, sesgo a la derecha (cola derecha)", "No, parece simétrica"], key="pregunta_sesgo", label_visibility="collapsed")
     
-    st.markdown("**C. Se observan valores atipicos (outliers) en el boxplot?**")
-    st.selectbox("Seleccione una observacion sobre los outliers:", ["(Seleccionar opción)", "Si, multiples valores atipicos", "Si, solo uno o dos aislados", "No se observan valores atipicos"], key="pregunta_outliers", label_visibility="collapsed")
+    st.markdown("**C. ¿Se observan valores atípicos (outliers) en el boxplot?**")
+    st.selectbox("Seleccione una observación sobre los outliers:", ["(Seleccionar opción)", "Sí, múltiples valores atípicos", "Sí, solo uno o dos aislados", "No se observan valores atípicos"], key="pregunta_outliers", label_visibility="collapsed")
 
 def graficar_prueba_z(z_calc, z_crit_izq, z_crit_der, tipo_prueba):
     fig_z, ax_z = plt.subplots(figsize=(10, 4))
     x = np.linspace(-4, 4, 1000)
     y = stats.norm.pdf(x, 0, 1)
     
-    # Sombreado default de No Rechazo (color neutro gris claro)
-    ax_z.fill_between(x, y, color="#ECEFF1", alpha=0.7, label="Region de NO Rechazo")
-    ax_z.plot(x, y, color="#455A64", linewidth=1.5)
+    # Sombreado default de No Rechazo (color neutro hueso oscuro)
+    ax_z.fill_between(x, y, color="#E3D7BF", alpha=0.6, label="Región de NO Rechazo")
+    ax_z.plot(x, y, color="#553D2A", linewidth=2)
 
-    color_rechazo = "#E57373"
+    color_rechazo = "#AB9680"
 
     if tipo_prueba == "Bilateral":
         x_shade_left = x[x <= z_crit_izq]
-        ax_z.fill_between(x_shade_left, stats.norm.pdf(x_shade_left, 0, 1), color=color_rechazo, alpha=0.8, label="Region de Rechazo")
+        ax_z.fill_between(x_shade_left, stats.norm.pdf(x_shade_left, 0, 1), color=color_rechazo, alpha=0.5, label="Región Crítica (Rechazo)")
         x_shade_right = x[x >= z_crit_der]
-        # Label only once to avoid duplication in legend
-        ax_z.fill_between(x_shade_right, stats.norm.pdf(x_shade_right, 0, 1), color=color_rechazo, alpha=0.8)
+        ax_z.fill_between(x_shade_right, stats.norm.pdf(x_shade_right, 0, 1), color=color_rechazo, alpha=0.5)
     elif tipo_prueba == "Cola izquierda":
         x_shade_left = x[x <= z_crit_izq]
-        ax_z.fill_between(x_shade_left, stats.norm.pdf(x_shade_left, 0, 1), color=color_rechazo, alpha=0.8, label="Region de Rechazo")
+        ax_z.fill_between(x_shade_left, stats.norm.pdf(x_shade_left, 0, 1), color=color_rechazo, alpha=0.5, label="Región Crítica (Rechazo)")
     else:
         x_shade_right = x[x >= z_crit_der]
-        ax_z.fill_between(x_shade_right, stats.norm.pdf(x_shade_right, 0, 1), color=color_rechazo, alpha=0.8, label="Region de Rechazo")
+        ax_z.fill_between(x_shade_right, stats.norm.pdf(x_shade_right, 0, 1), color=color_rechazo, alpha=0.5, label="Región Crítica (Rechazo)")
 
-    ax_z.axvline(x=z_calc, color="#1976D2", linestyle="--", linewidth=2.5, label=f"Z Calculado = {z_calc:.2f}")
+    ax_z.axvline(x=z_calc, color="#7E634E", linestyle="--", linewidth=2.5, label=f"Z Calculado = {z_calc:.2f}")
     
-    ax_z.set_title("Distribucion Normal Estandar (Z-Test)", fontsize=12, pad=10)
-    ax_z.set_xlabel("Puntuacion Z (Desviaciones Estandar)")
+    ax_z.set_title("Distribución Normal Estándar (Prueba Z)", fontsize=12, pad=10, fontweight='bold')
+    ax_z.set_xlabel("Puntuación Z (Desviaciones Estándar)")
     ax_z.set_ylabel("Densidad")
-    ax_z.legend(loc="upper left")
+    ax_z.legend(loc="upper left", frameon=False)
     
-    # Hide top and right spines for a cleaner minimalist look
     ax_z.spines['top'].set_visible(False)
     ax_z.spines['right'].set_visible(False)
+    ax_z.grid(True, linestyle=':', color='#C7B69F', alpha=0.5)
     
-    st.pyplot(fig_z)
+    st.pyplot(fig_z, transparent=True)
 
 def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba, z_calc, p_value, decision):
     st.divider()
-    st.header("5. Asistente Estadistico con IA")
+    st.header("5. Asistente Estadístico con IA")
     api_key = os.environ.get("GEMINI_API_KEY")
 
-    if st.button("Consultar Conclusion con la IA"):
+    if st.button("Consultar Conclusión con la IA"):
         if not api_key:
-            st.error("Por favor, configure la GEMINI_API_KEY en el archivo .env en la raiz de la app.")
+            st.error("Por favor, configure la GEMINI_API_KEY en el archivo .env en la raíz de la app.")
         else:
             try:
                 client = genai.Client(api_key=api_key)
-                prompt = (f"Se realizo una prueba Z con estos caracteristicas: "
+                prompt = (f"Se realizó una prueba Z con estos características: "
                           f"N = {n_obs}, Media = {media_muestral:.4f}, Desv = {desviacion_muestral:.4f}, "
                           f"Z = {z_calc:.4f}, P-Value = {p_value:.4f}, Alpha = {alpha}, "
-                          f"Decision matematica calculada: {decision}. "
-                          f"Redacta una explicacion muy profesional, limpia (sin emojis) e interpreta este resultado.")
+                          f"Decisión matemática calculada: {decision}. "
+                          f"Redacta una explicación muy profesional, limpia (sin emojis) e interpreta este resultado.")
                 
                 with st.spinner("Conectando con Google Gemini..."):
                     response = client.models.generate_content(
@@ -233,21 +258,21 @@ def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba,
 
 def modulo_prueba_z(datos):
     st.divider()
-    st.header("4. Planteamiento de la Prueba de Hipotesis (Z)")
+    st.header("4. Planteamiento de la Prueba de Hipótesis (Z)")
 
     n_obs = len(datos)
     if n_obs < 30:
-        st.warning("El tamano de la muestra es menor a 30. Esto puede afectar la validez del estadistico Z.")
+        st.warning("El tamaño de la muestra es menor a 30. Esto puede afectar la validez del estadístico Z.")
 
     col_conf1, col_conf2, col_conf3 = st.columns(3)
     with col_conf1:
-        valor_h0 = st.number_input("Valor esperado (µ para H0):", value=70.0, step=1.0)
+        valor_h0 = st.number_input("Valor esperado (µ para H₀):", value=70.0, step=1.0)
     with col_conf2:
         tipo_prueba = st.selectbox("Tipo de contraste:", ["Bilateral", "Cola izquierda", "Cola derecha"])
     with col_conf3:
         alpha = st.selectbox("Nivel de significancia (α):", [0.01, 0.05, 0.10], index=1)
 
-    st.markdown("### Hipotesis Planteadas")
+    st.markdown("### Hipótesis Planteadas")
     
     col_latex1, col_latex2 = st.columns(2)
     with col_latex1:
@@ -266,7 +291,7 @@ def modulo_prueba_z(datos):
     error_estandar = desviacion_muestral / np.sqrt(n_obs)
 
     if error_estandar == 0:
-        st.error("La desviacion estándar es 0, impidiendo el cálculo del error estandar.")
+        st.error("La desviación estándar es 0, impidiendo el cálculo del error estándar.")
         return
 
     z_calc = (media_muestral - valor_h0) / error_estandar
@@ -289,14 +314,14 @@ def modulo_prueba_z(datos):
 
     decision = "Rechazar H0" if p_value < alpha else "No rechazar H0"
 
-    st.markdown("### Resultados Estadisticos")
+    st.markdown("### Resultados Estadísticos")
     col_res1, col_res2, col_res3, col_res4 = st.columns(4)
-    col_res1.metric("Estadistico Z", f"{z_calc:.4f}")
-    col_res2.metric("P-Value", f"{p_value:.4f}")
-    col_res3.metric("Region Critica", str_region)
-    col_res4.metric("Decision Automatica", decision)
+    col_res1.metric("Estadístico Z", f"{z_calc:.4f}")
+    col_res2.metric("Valor p", f"{p_value:.4f}")
+    col_res3.metric("Región Crítica", str_region)
+    col_res4.metric("Decisión Automática", decision)
 
-    st.markdown("### Visualizacion de Zonas")
+    st.markdown("### Visualización de Parámetros")
     graficar_prueba_z(z_calc, z_crit_izq, z_crit_der, tipo_prueba)
     
     asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba, z_calc, p_value, decision)
