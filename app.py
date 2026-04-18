@@ -124,9 +124,15 @@ def mostrar_visualizaciones(datos, variable_seleccionada):
 def cuestionario_exploratorio():
     st.divider()
     st.header("3. Analisis Exploratorio - Cuestionario")
-    st.text_area("A. Basandose en los graficos, la distribucion parece normal? Justifique.", key="pregunta_normalidad", height=80)
-    st.text_area("B. Hay presencia de sesgo (asimetria) en la distribucion? Explique.", key="pregunta_sesgo", height=80)
-    st.text_area("C. Se observan valores atipicos (outliers) en el boxplot? Describa.", key="pregunta_outliers", height=80)
+    
+    st.markdown("**A. Basandose en los graficos, la distribucion parece normal?**")
+    st.radio("Seleccione una opcion para la distribucion:", ["Si, se aproxima a una campana de Gauss", "No, difiere significativamente", "No estoy seguro visualmente"], key="pregunta_normalidad", horizontal=True, label_visibility="collapsed")
+    
+    st.markdown("**B. Hay presencia de sesgo (asimetria) en la distribucion?**")
+    st.radio("Seleccione el tipo de sesgo:", ["Si, sesgo a la izquierda (cola izquierda)", "Si, sesgo a la derecha (cola derecha)", "No, parece simetrica"], key="pregunta_sesgo", horizontal=True, label_visibility="collapsed")
+    
+    st.markdown("**C. Se observan valores atipicos (outliers) en el boxplot?**")
+    st.radio("Seleccione una observacion sobre los outliers:", ["Si, multiples valores atipicos", "Si, solo uno o dos aislados", "No se observan valores atipicos"], key="pregunta_outliers", horizontal=True, label_visibility="collapsed")
 
 def graficar_prueba_z(z_calc, z_crit_izq, z_crit_der, tipo_prueba):
     fig_z, ax_z = plt.subplots(figsize=(10, 4))
