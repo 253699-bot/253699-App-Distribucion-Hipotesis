@@ -15,10 +15,10 @@ def configurar_pagina():
     
     st.markdown("""
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
         
         html, body, [class*="css"] {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Montserrat', sans-serif;
         }
         
         p, h1, h2, h3, h4, h5, h6, span {
@@ -26,39 +26,51 @@ def configurar_pagina():
         }
 
         .stApp {
-            background-color: #EAEBED;
+            background-color: #F5F0E6;
         }
 
         [data-testid="stSidebar"] {
-            background: linear-gradient(180deg, #006989 0%, #007090 100%);
+            background: linear-gradient(180deg, #3e2a20 0%, #111111 100%);
         }
         
-        [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+        [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3, [data-testid="stSidebar"] label {
             color: #FFFFFF !important;
         }
         
         .stButton>button {
-            background-color: #006989 !important;
-            color: #FFFFFF !important;
+            background-color: #a2fdd5 !important;
+            color: #111111 !important;
             border: none !important;
             border-radius: 8px !important;
             transition: all 0.3s ease !important;
+            font-weight: 600;
         }
         
         .stButton>button:hover {
-            background-color: #007090 !important;
-            color: #FFFFFF !important;
+            box-shadow: 0 4px 10px rgba(162, 253, 213, 0.4);
+            transform: translateY(-2px);
         }
 
-        [data-testid="metric-container"] {
-            background-color: #A3BAC3;
+        [data-testid="metric-container"], .css-1r6slb0 {
+            background-color: #F7F7F7;
             padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid #EBEBEB;
         }
         
         [data-testid="metric-container"] label, [data-testid="metric-container"] div {
             color: #1A1A1A !important;
+        }
+        
+        /* Modificar el titulo del sidebar manual via clase CSS ya que esta embebido en st.sidebar.markdown */
+        .jade-cobra-title {
+            color: #a2fdd5 !important;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: 1px;
+            text-align: center;
+            margin-bottom: 20px;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -93,7 +105,7 @@ def generar_sinteticos():
     return datos, "valor_sintetico"
 
 def obtener_datos():
-    st.sidebar.title("Analisis Estadistico")
+    st.sidebar.markdown('<p class="jade-cobra-title">JADE COBRA</p>', unsafe_allow_html=True)
     st.sidebar.markdown("---")
     st.sidebar.header("Entrada de Datos")
     fuente_datos = st.sidebar.radio(
