@@ -13,32 +13,52 @@ load_dotenv()
 def configurar_pagina():
     st.set_page_config(page_title="Analisis Estadistico", layout="wide")
     
-    # CSS Customizado Minimalista y Neutro
     st.markdown("""
         <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+        
+        html, body, [class*="css"] {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        p, h1, h2, h3, h4, h5, h6, span {
+            color: #1A1A1A;
+        }
+
         .stApp {
-            background-color: #F9F9F9;
+            background-color: #EAEBED;
         }
-        .css-1d391kg {
-            background-color: #FFFFFF;
+
+        [data-testid="stSidebar"] {
+            background: linear-gradient(180deg, #006989 0%, #007090 100%);
         }
+        
+        [data-testid="stSidebar"] p, [data-testid="stSidebar"] span, [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {
+            color: #FFFFFF !important;
+        }
+        
         .stButton>button {
-            background-color: #FFFFFF;
-            color: #333333;
-            border: 1px solid #DDDDDD;
-            border-radius: 4px;
-            transition: all 0.3s;
+            background-color: #006989 !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            transition: all 0.3s ease !important;
         }
+        
         .stButton>button:hover {
-            border-color: #888888;
-            color: #111111;
+            background-color: #007090 !important;
+            color: #FFFFFF !important;
         }
-        h1, h2, h3 {
-            color: #2C3E50;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+        [data-testid="metric-container"] {
+            background-color: #A3BAC3;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
-        hr {
-            border-top: 1px solid #E0E0E0;
+        
+        [data-testid="metric-container"] label, [data-testid="metric-container"] div {
+            color: #1A1A1A !important;
         }
         </style>
     """, unsafe_allow_html=True)
