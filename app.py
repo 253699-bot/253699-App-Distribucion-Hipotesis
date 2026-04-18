@@ -82,7 +82,7 @@ def configurar_pagina():
         .jade-cobra-title {
             color: #a2fdd5 !important;
             font-weight: 800;
-            font-size: 24px;
+            font-size: 34px;
             letter-spacing: 1px;
             text-align: center;
             margin-bottom: 20px;
