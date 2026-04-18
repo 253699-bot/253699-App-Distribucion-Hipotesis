@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
-import google.generativeai as genai
+from google import genai
 import os
 from dotenv import load_dotenv
 
@@ -213,8 +213,7 @@ def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba,
             st.error("Por favor, configure la GEMINI_API_KEY en el archivo .env en la raiz de la app.")
         else:
             try:
-                genai.configure(api_key=api_key)
-                model = genai.GenerativeModel("gemini-1.5-flash")
+                client = genai.Client(api_key=api_key)
                 prompt = (f"Se realizo una prueba Z con estos caracteristicas: "
                           f"N = {n_obs}, Media = {media_muestral:.4f}, Desv = {desviacion_muestral:.4f}, "
                           f"Z = {z_calc:.4f}, P-Value = {p_value:.4f}, Alpha = {alpha}, "
@@ -222,7 +221,10 @@ def asistente_ia(media_muestral, n_obs, desviacion_muestral, alpha, tipo_prueba,
                           f"Redacta una explicacion muy profesional, limpia (sin emojis) e interpreta este resultado.")
                 
                 with st.spinner("Conectando con Google Gemini..."):
-                    response = model.generate_content(prompt)
+                    response = client.models.generate_content(
+                        model='gemini-1.5-flash',
+                        contents=prompt
+                    )
                     st.info(response.text)
             except Exception as e:
                 st.error(f"Error de API: {str(e)}")
